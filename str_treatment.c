@@ -6,7 +6,7 @@
 /*   By: eherrero <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/27 16:05:46 by eherrero          #+#    #+#             */
-/*   Updated: 2019/12/16 17:26:37 by eherrero         ###   ########.fr       */
+/*   Updated: 2019/12/17 17:57:49 by eherrero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int		ft_save_chr(t_data *data, char c)
 	char *tmp;
 	int i;
 	
-	printf("(chr)size: %d plus %d (%c)\n", data->size, 1, c);
+//printf("(chr)size: %d plus %d (%c)\n", data->size, 1, c);
 	if(!(tmp = malloc(ft_strlen(data->out) + 2)))//tal vez usar size
 		return (0);
 	//printf("char added: %c, prev size: %d strlen %d\n", c, data->size, ft_strlen(data->out));
@@ -75,16 +75,20 @@ int		ft_save(t_data *data, char *str)
 }
 */
 
-int		ft_save(t_data *data, char *str, int size)
+int		ft_save(t_data *data, char *tab, int size)
 {
-	char	*newstr;
+	char	*tab_aux;
 
-	if (!(newstr = (ft_arraynjoin(data->out, str, data->size, size))))
+	tab_aux = ft_arraynjoin(data->out, tab, data->size, size);
+	if (!tab_aux)
 		return (0);
-	free (data->out);
-	data->out = newstr;
-	printf("(str)size: %d plus %d (%s)\n", data->size, size, str);
+//printf("(str)size: %d plus %d (", data->size, size);
+	ft_printnchr_fd(tab, size, 1);
+//printf(")\n");
 	data->size += size;
+	free(data->out);
+	free(tab);
+	data->out = tab_aux;
 	return (1);
 }
 
@@ -120,7 +124,7 @@ void	ft_data_init(t_data *data, const char *str)
 	data->zero_flag = 0;
 	data->actual_type = 0;
 	data->set_flags = ft_strdup("-0");
-	data->set_types = ft_strdup("ucsdpxi%");
+	data->set_types = ft_strdup("ucsdpxXi%");
 	data->out = ft_strdup("");
 	data->str = ft_strdup(str);
 //	printf("sin problemas\n");

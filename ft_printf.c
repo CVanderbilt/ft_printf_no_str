@@ -6,7 +6,7 @@
 /*   By: eherrero <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/27 18:38:23 by eherrero          #+#    #+#             */
-/*   Updated: 2019/12/12 19:39:33 by eherrero         ###   ########.fr       */
+/*   Updated: 2019/12/17 18:13:17 by eherrero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,21 +25,19 @@ int		ft_state_print(t_data *data)
 	str = data->str;
 	//printf("str[i]: >%c<\n", str[i]);
 	if (str[i] == 'c')
-		return (ft_printf_chr(data));
+		return (ft_print_chr(data));
 	if (str[i] == 's')
-		return (ft_printf_str(data));
+		return (ft_print_str(data));
 	if (ft_in_set("di", str[i]))
-		return (ft_printf_int(data));
+		return (ft_print_int(data));
 	if (str[i] == 'p')
-		return (ft_printf_ptr(data));
-	if (ft_in_set("xX", str[i]))
-		return (ft_printf_hex(data));
+		return (ft_print_ptr(data));
+	if (ft_in_set("uxX", str[i]))
+		return (ft_print_uns(data));
 	if (str[i] == '%')
-		return (ft_printf_ptg(data));
-	if (str[i] == 'u')
-		return (ft_printf_uns(data));
+		return (ft_print_ptg(data));
 	else
-		return (ft_printf_err(data));
+		return (str[i] == 0 ? 1 : ft_print_err(data));
 }
 
 int		ft_state_precision(t_data *data)
@@ -55,7 +53,7 @@ int		ft_state_precision(t_data *data)
 	i = data->pos;
 	str = data->str;
 	if (str[i] != '.')
-		return (0);
+		return (str[i] == 0 ? 1 : 0);//modificado para cuando null acabar
 	data->precision = 0;
 	i++;
 	if (str[i] == '*')
@@ -70,7 +68,7 @@ int		ft_state_precision(t_data *data)
 			i++;
 	}
 	data->pos = i;
-	return (ft_state_print(data));
+	return (str[i] == 0 ? 1 : ft_state_print(data));//modificado para  cuandp null acabar
 }
 
 int		ft_state_width(t_data *data)
@@ -96,7 +94,7 @@ int		ft_state_width(t_data *data)
 			i++;
 	}
 	else
-		return (0);
+		return (str[i] == 0 ? 1 : 0);//modificado para cuando null acabar
 	data->pos = i;
 	if (str[i] == '.')
 		return (ft_state_precision(data));
@@ -123,7 +121,7 @@ int		ft_state_flags(t_data *data)
 		if (str[i] == '*' || ft_isdigit(str[i]))
 			return (ft_state_width(data));
 		//if (ft_in_set(data->set_types, str[i]))
-		return (ft_state_print(data));
+		return (str[i] = 0 ? 1 : ft_state_print(data));//modificado para cundo null acabar
 	}	
 	data->pos++;
 	return (ft_state_flags(data));
@@ -141,14 +139,10 @@ int		ft_printf(const char *str, ...)
 		//printf("\n\nentra al while\nanaliza: %c\n", str[data.pos]);
 		if (str[data.pos] == '%')
 		{
+//printf("encontrado %%: data->pos = %d\n", data.pos);
 			data.pos++;
-			if (str[data.pos] == '%')
-			{
-				ft_save(&data, "%");
-				data.pos++;
-			}
-			else
-				ft_state_flags(&data);
+			ft_state_flags(&data);
+			printf("??\n");
 		}
 		else
 		{
@@ -156,24 +150,21 @@ int		ft_printf(const char *str, ...)
 			ft_save_chr(&data, data.str[data.pos]);
 			data.pos++;
 		}
+		//printf("next_char: >%c<\n", str[data.pos]);
 		ft_reinit_data(&data);
 	}
-
-/*	printf("-----------final_state------------\n\n");
+/*
+	printf("-----------final_state------------\n\n");
 	ft_print_data(&data);
 	printf("----------------------------------\n\n");
-	*/
+*/	
 
 	
 	//printf("original:\n");	
 	//ft_putstr_fd(data.out, 1);
-	//printf("nuevo:\n");	
+	//printf("nuevo:\n");
 	ft_printnchr_fd(data.out, data.size, 1);
 	return (data.size);
-
-	printf("num: %d\n", data.size);
-	ft_putstr_fd(data.out, 1);
-	return (ft_strlen(data.out));
 }
 /*
 int main()

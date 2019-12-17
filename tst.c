@@ -19,23 +19,11 @@ int main()
 	int a13;
 	int a14;
 	int a15;
-/*
-	kk = ft_printf("%p%p%p%p%p%p%p%p%p%p%p%p%p%p%p",&a01,&a02,&a03,&a04,&a05,&a06,&a07,&a08,&a09,&a10,&a11,&a12,&a13,&a14,&a15);
-	printf("%d\n", kk);
-	kk = printf("%p%p%p%p%p%p%p%p%p%p%p%p%p%p%p",&a01,&a02,&a03,&a04,&a05,&a06,&a07,&a08,&a09,&a10,&a11,&a12,&a13,&a14,&a15);
-	printf("%d\n", kk)*/;
-
-	char c;
 	
-	printf("%%.10c: >%c<\n", 'f');
-	printf("%%.10d(p>s): >%.10d<\n", 2367);
-	printf("%%.3d(p<s): >%.3d<\n", 2367);
-
-
-/*	c = 0;
-	kk = printf("sys>%c<\n", c);
-	printf("%d\n", kk);
-	kk = ft_printf("mio>%c<\n", c);
-	printf("%d\n", kk);
-	//ft_printnchr_fd("test de prueba", 10, 1);*/
+	printf("sys:\n");
+	kk = printf("solo %d texto", -167);
+	printf("\n%d\n", kk);
+	printf("mio:\n");
+	kk = ft_printf("solo %d texto", -167);
+	printf("\n%d\n", kk);
 }
