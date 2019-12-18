@@ -15,6 +15,7 @@
 void	ft_print_data(t_data *data)
 {
 	printf("char: >%c<\n", data->str[data->pos]);
+	printf("char: >%d<\n", data->str[data->pos]);
 	printf("actual_type->%c\n", data->actual_type);
 	printf("size->%d\n", data->size);
 	printf("pos->%d\n", data->pos);
@@ -22,8 +23,8 @@ void	ft_print_data(t_data *data)
 	printf("precision->%d\n", data->precision);
 	printf("minus_flag->%d\n", data->minus_flag);
 	printf("zero_flag->%d\n", data->zero_flag);
-	printf("str->%s\n", data->str);
-	printf("out->%s\n", data->out);
+	printf("str->%s<\n", data->str);
+	printf("out->%.*s<\n", data->size, data->out);
 	printf("set_flags->%s\n", data->set_flags);
 	printf("set_types->%s\n", data->set_types);
 }
@@ -165,6 +166,33 @@ char	*ft_precision_int(t_data *data, char *str, int precision)
 	ft_memmove(ret + precision - size, str, size);
 	return (ret);
 }
+
+void	ft_check_sign(char *str)
+{
+	int i;
+	int zero_pos;
+
+	i = 0;
+	//printf("str >%s<\n", str);
+	while (str[i] == ' ')
+		i++;
+	//printf("los espacios acaban en i %d\n", i);
+	if (str[i] != '0')
+		return ;
+	//printf("encontramos un 0\n");
+	zero_pos = i;
+	while (str[i] == '0')
+		i++;
+	//printf("los 0s acaban en i %d\n", i);
+	if (!ft_in_set("+-", str[i]))
+		return ;
+	//printf("encontramos un %c\n", str[i]);
+	str[zero_pos] = str[i];
+	str[i] = '0';
+	//printf("mod: >%s<\n", str);
+}
+
+
 int		ft_print_int(t_data *data)
 {
 	int		n;
@@ -175,7 +203,8 @@ int		ft_print_int(t_data *data)
 
 //ft_print_data(data);
 	n = va_arg(g_args, int);
-	tab = ft_itoa(n);
+	tab = data->plus_flag ? ft_itoa_plus(n) : ft_itoa(n);
+	//printf("num >%s<\n", tab);
 	if (!tab)
 		return (0);
 	precision = data->precision;
@@ -184,6 +213,7 @@ int		ft_print_int(t_data *data)
 	size = ft_strlen(tab);
 	if (precision > size)
 	{
+		//printf("entra a precision\n");
 		tab_aux = ft_precision_int(data, tab, precision);
 		free(tab);
 		tab = tab_aux;
@@ -191,12 +221,19 @@ int		ft_print_int(t_data *data)
 	}
 	if (data->width > size)
 	{
+		//printf("entra a width\n");
 		tab_aux = ft_width_int(data, tab);
 		free(tab);
 		tab = tab_aux;
 		size = ft_strlen(tab);
 	}
+	//ft_check_plus(data, tab);
+	//"       000000-123"
+	//"       -000000123"
+	ft_check_sign(tab);
 	data->pos++;
+	//printf("devueve %s\n", tab);
+	//printf("size: %d\n", size);
 	return (ft_save(data, tab, size));
 }//end print_int
 //start print_uns y valido para %x y %X
@@ -261,6 +298,7 @@ char	*ft_width_ptr(t_data *data, char *str)
 {
 	int		len;
 	int		mod;
+	int		head_size;
 	char	*ret;
 	char	*ret_aux;
 
@@ -280,10 +318,18 @@ char	*ft_width_ptr(t_data *data, char *str)
 	if (!ret)
 		return (0);
 	len = ft_strlen(ret);
-	ret_aux = malloc(len + 3);
+	//printf("len %d\n", len);
+	head_size = data->plus_flag ? 3 : 2;
+	printf("head_size %d\n", head_size);
+	ret_aux = malloc(len + head_size + 1);
+	printf("reserva: %d\n", len + head_size + 1);
+	if (!ret_aux)
+		return (0);
 	ft_memmove(ret_aux + 2, ret, len);
-	ret_aux[0] = '0';
-	ret_aux[1] = 'x';
+	ret_aux[0] = data->plus_flag ? '+' : '0';
+	ret_aux[1] = data->plus_flag ? '0' : 'x';
+	ret_aux[2] = data->plus_flag ? 'x' : ret_aux[2];
+	ret_aux[len + head_size + 1] = 0;
 	free(ret);
 	ret = ret_aux;
 	return (ret);
@@ -291,18 +337,20 @@ char	*ft_width_ptr(t_data *data, char *str)
 
 int		ft_print_ptr(t_data *data)
 {
-	unsigned int	n;
-	int				size;
-	char			*str;
-	char			*str_aux;
+	long unsigned int	n;
+	int					size;
+	char				*str;
+	char				*str_aux;
 
 //printf("entra a print_ptr\n");
 //ft_print_data(data);
-	n = va_arg(g_args, unsigned int);
+	n = va_arg(g_args, long unsigned int);
 	str = ft_itoa_unsigned(n, "0123456789abcdef");
 	if (!str)
 		return (0);
 	size = ft_strlen(str);
+	//printf("str >%s<\n", str);
+	//printf("size: %d\n", size);
 	data->zero_flag = data->precision < 0 ? data->zero_flag : 0;
 	if (data->zero_flag && !data->minus_flag && data->precision < data->width - 2)
 		data->precision = data->width - 2;

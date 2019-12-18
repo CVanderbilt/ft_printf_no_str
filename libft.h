@@ -24,6 +24,7 @@ typedef	struct	s_list
 char			**ft_split(char const *s, char c);
 char			*ft_itoa(long int n);
 char			*ft_itoa_base(long int n, char *base);
+char			*ft_itoa_plus(long int n);
 char			*ft_itoa_unsigned(long unsigned int n, char *base);
 char			*ft_strchr(const char *s, int c);
 char			*ft_strrchr(const char *s, int c);

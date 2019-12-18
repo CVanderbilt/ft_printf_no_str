@@ -15,7 +15,7 @@
 int		ft_state_print(t_data *data)
 {
 	int		i;
-	char	*str;
+	char	const *str;
 /*
 	printf("----------ft_state_print----------\n\n");
 	ft_print_data(data);
@@ -42,8 +42,8 @@ int		ft_state_print(t_data *data)
 
 int		ft_state_precision(t_data *data)
 {
-	int		i;
-	char	*str;
+	int			i;
+	const char	*str;
 /*
 	printf("--------ft_state_precision--------\n\n");
 	ft_print_data(data);
@@ -74,7 +74,7 @@ int		ft_state_precision(t_data *data)
 int		ft_state_width(t_data *data)
 {
 	int		i;
-	char	*str;
+	const char	*str;
 /*
 	printf("----------ft_state_width----------\n\n");
 	ft_print_data(data);
@@ -104,7 +104,7 @@ int		ft_state_width(t_data *data)
 int		ft_state_flags(t_data *data)
 {
 	int		i;
-	char	*str;
+	const char	*str;
 	char	*set;
 /*
 	printf("----------ft_state_flags----------\n\n");
@@ -121,7 +121,7 @@ int		ft_state_flags(t_data *data)
 		if (str[i] == '*' || ft_isdigit(str[i]))
 			return (ft_state_width(data));
 		//if (ft_in_set(data->set_types, str[i]))
-		return (str[i] = 0 ? 1 : ft_state_print(data));//modificado para cundo null acabar
+		return (str[i] == 0 ? 1 : ft_state_print(data));//modificado para cundo null acabar
 	}	
 	data->pos++;
 	return (ft_state_flags(data));
@@ -137,10 +137,10 @@ int		ft_printf(const char *str, ...)
 	while (str[data.pos])
 	{
 		//printf("\n\nentra al while\nanaliza: %c\n", str[data.pos]);
-		printf("parece que modificamos str, hacer const");
-		printf("\n----------intro----------\n");
-		ft_print_data(&data);
-		printf("-------------------------\n\n");
+		//printf("parece que modificamos str, hacer const");
+		//printf("\n----------intro----------\n");
+		//ft_print_data(&data);
+		//printf("-------------------------\n\n");
 		if (str[data.pos] == '%')
 		{
 //printf("encontrado %%: data->pos = %d\n", data.pos);
@@ -152,6 +152,7 @@ int		ft_printf(const char *str, ...)
 		else
 		{
 			//printf("save\n");
+			//printf("saving char: %c\n", str[data.pos]);
 			ft_save_chr(&data, data.str[data.pos]);
 			data.pos++;
 		}

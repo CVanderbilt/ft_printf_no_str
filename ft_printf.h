@@ -20,17 +20,18 @@ va_list			g_args;
 
 typedef struct	s_data
 {
-	int		pos;
-	int		size;
-	int		width;
-	int		precision;
-	int		minus_flag;
-	int		zero_flag;
-	char	actual_type;
-	char	*str;
-	char	*out;
-	char	*set_flags;
-	char	*set_types;
+	int			pos;
+	int			size;
+	int			width;
+	int			precision;
+	int			minus_flag;
+	int			zero_flag;
+	int			plus_flag;
+	char		actual_type;
+	const char	*str;
+	char		*out;
+	char		*set_flags;
+	char		*set_types;
 }				t_data;
 
 

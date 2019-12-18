@@ -20,11 +20,11 @@ int main()
 	int a14;
 	int a15;
 	
-	/*printf("sys:\n");
-	kk = printf("solo %s texto", 0);
+	printf("%lu\n", &kk);
+	printf("sys:\n");
+	kk = printf("solo %+p texto", &kk);
 	printf("\n%d\n", kk);
 	printf("mio:\n");
-	kk = ft_printf("solo %s texto", 0);
-	printf("\n%d\n", kk);*/
-	ft_printf("%+i");
+	kk = ft_printf("solo %+p texto", &kk);
+	printf("\n%d\n", kk);
 }

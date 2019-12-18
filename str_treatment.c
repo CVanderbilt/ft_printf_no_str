@@ -18,6 +18,8 @@ int		ft_active_flag(t_data *data, char flag)
 		data->minus_flag = 1;
 	else if (flag == '0')
 		data->zero_flag = 1;
+	else if (flag == '+')
+		data->plus_flag = 1;
 	else
 		return (0);
 	return (1);
@@ -43,23 +45,27 @@ int		ft_save_chr(t_data *data, char c)
 	*/
 	char *tmp;
 	int i;
-printf("===================================\n");
-printf("(chr)size: %d plus %d (%c)\n", data->size, 1, c);
-printf("data->pos = %d\n", data->pos);
-ft_print_data(data);
-printf("===================================\n");
-	if(!(tmp = malloc(ft_strlen(data->out) + 2)))//tal vez usar size
+//printf("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n");
+//printf("(chr)size: %d plus %d (%c)\n", data->size, 1, c);
+//printf("data->pos = %d\n", data->pos);
+//ft_print_data(data);
+//printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
+	if(!(tmp = malloc(data->size + 1)))//tal vez usar size
 		return (0);
 	//printf("char added: %c, prev size: %d strlen %d\n", c, data->size, ft_strlen(data->out));
 	//printf("data out: %s\n", data->out);
-	data->size++;
 	i = -1;
-	while(data->out[++i])
+	//while(data->out[++i])
+	//	tmp[i] = data->out[i];
+	while (++i < data->size)
 		tmp[i] = data->out[i];
 	tmp[i] = c;
-	tmp[i + 1] = 0;
 	free(data->out);
 	data->out = tmp;
+	//ft_printnchr_fd(data->out, data->size, 1);
+	//write(1, "\n", 1);
+	data->size++;
+	//printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
 	return (1);
 }
 /*
@@ -83,15 +89,20 @@ int		ft_save(t_data *data, char *tab, int size)
 	char	*tab_aux;
 
 	tab_aux = ft_arraynjoin(data->out, tab, data->size, size);
+	//ft_printnchr_fd(tab_aux, data->size + size, 1);
 	if (!tab_aux)
 		return (0);
-printf("(str)size: %d plus %d (", data->size, size);
-ft_printnchr_fd(tab, size, 1);
-printf(")\n");
+//printf("(str)size: %d plus %d (", data->size, size);
+//ft_printnchr_fd(tab, size, 1);
+//printf(")\n");
+//	printf("size: %d\n", data->size);
 	data->size += size;
+//	printf("new size: %d\n", data->size);
 	free(data->out);
 	free(tab);
 	data->out = tab_aux;
+//	ft_printnchr_fd(tab_aux, data->size + 1, 1);
+//	write(1, "\n", 1);
 	return (1);
 }
 
@@ -124,9 +135,10 @@ void	ft_data_init(t_data *data, const char *str)
 	data->size = 0;
 	data->precision = -1;
 	data->minus_flag = 0;
+	data->plus_flag = 0;
 	data->zero_flag = 0;
 	data->actual_type = 0;
-	data->set_flags = ft_strdup("-0");
+	data->set_flags = ft_strdup("-0+");
 	data->set_types = ft_strdup("ucsdpxXi%");
 	data->out = ft_strdup("");
 	data->str = ft_strdup(str);
@@ -139,5 +151,6 @@ void	ft_reinit_data(t_data *data)
 	data->precision = -1;
 	data->minus_flag = 0;
 	data->zero_flag = 0;
+	data->plus_flag = 0;
 	data->actual_type = 0;
 }
