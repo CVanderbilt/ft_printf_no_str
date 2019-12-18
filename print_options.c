@@ -16,6 +16,7 @@ void	ft_print_data(t_data *data)
 {
 	printf("char: >%c<\n", data->str[data->pos]);
 	printf("actual_type->%c\n", data->actual_type);
+	printf("size->%d\n", data->size);
 	printf("pos->%d\n", data->pos);
 	printf("width->%d\n", data->width);
 	printf("precision->%d\n", data->precision);
@@ -57,7 +58,7 @@ char	*ft_width_str(t_data *data, char *str)
 int		ft_print_str(t_data *data)
 {
 	char	*tab;
-	char	*tab_aux;
+	//char	*tab_aux;
 	char	*tmp;
 	int		size;
 	int		precision;
@@ -65,10 +66,12 @@ int		ft_print_str(t_data *data)
 //printf("entra a print_str\n");
 //ft_print_data(data);
 	tmp = va_arg(g_args, char *);
-	if(!tmp)
-		return (ft_save(data, ft_strdup("(null)"), 6));
+	if (!tmp)
+		tmp = ft_strdup("(null)");
+	if (!tmp)
+		return (0);
 	size = ft_strlen(tmp);
-	precision = data->precision > 0 ? data->precision : size;
+	precision = data->precision >= 0 ? data->precision : size;
 	precision  = precision > size ? size : precision;
 	tab = ft_strndup(tmp, precision);
 	if (!tab)
@@ -91,7 +94,7 @@ int		ft_print_str(t_data *data)
 int		ft_print_chr(t_data *data)
 {
 	char			*tab;
-	char			*tab_aux;
+//	char			*tab_aux;
 	unsigned int	chr;
 	int				chr_pos;
 
@@ -104,12 +107,13 @@ int		ft_print_chr(t_data *data)
 		if (!tab)
 			return (0);
 		tab[0] = chr;
+		data->pos++;
 		return (ft_save(data, tab, 1));
 	}
 	tab = malloc(data->width);
 	if (!tab)
 		return (0);
-	chr_pos = data->minus_flag ? 0 : data->width;
+	chr_pos = data->minus_flag ? 0 : data->width - 1;
 	ft_memset(tab, ' ', data->width);
 	tab[chr_pos] = chr;
 	data->pos++;
@@ -151,6 +155,7 @@ char	*ft_precision_int(t_data *data, char *str, int precision)
 	char	*ret;
 	int		size;
 
+	data->pos = data->pos;
 	ret = malloc(precision + 1);
 	if (!ret || !str)
 		return (0);
@@ -168,7 +173,6 @@ int		ft_print_int(t_data *data)
 	char	*tab;
 	char	*tab_aux;
 
-//printf("entra a print_int\n");
 //ft_print_data(data);
 	n = va_arg(g_args, int);
 	tab = ft_itoa(n);
@@ -216,6 +220,7 @@ int		ft_print_uns(t_data *data)
 	if (!tab)
 		return (0);
 	precision = data->precision;
+	size = ft_strlen(tab);
 	if (data->minus_flag)
 		precision = data->precision > data->width ? precision : data->width;
 	if (precision > size)
@@ -241,13 +246,14 @@ char	*ft_precision_ptr(t_data *data, char *str, int precision)
 	int		len;
 	char	*ret;
 
+	data->pos = data->pos;
 	len = ft_strlen(str);
-	ret = malloc(data->precision + 1);
+	ret = malloc(precision + 1);
 	if (!ret)
 		return (0);
-	ret[data->precision] = 0;
-	ft_memset(ret, '0', data->precision - len);
-	ft_memmove(ret + data->precision - len, str, len);
+	ret[precision] = 0;
+	ft_memset(ret, '0', precision - len);
+	ft_memmove(ret + precision - len, str, len);
 	return (ret);
 }
 
@@ -318,26 +324,30 @@ int		ft_print_ptr(t_data *data)
 int		ft_print_ptg(t_data *data)
 {
 	char	*tab;
-	char	*tab_aux;
+	//char	*tab_aux;
 	char	chr;
+	char	blank;
 	int		chr_pos;
 
 //printf("entra a print_ptg\n");
 //ft_print_data(data);
 	chr = '%';
+
+	blank = data->zero_flag && !data->minus_flag ? '0' : ' ';
 	if(data->width <= 1)
 	{
 		tab = malloc(1);
 		if (!tab)
 			return (0);
 		tab[0] = chr;
+		data->pos++;
 		return (ft_save(data, tab, 1));
 	}
 	tab = malloc(data->width);
 	if (!tab)
 		return (0);
-	chr_pos = data->minus_flag ? 0 : data->width;
-	ft_memset(tab, ' ', data->width);
+	chr_pos = data->minus_flag ? 0 : data->width - 1;
+	ft_memset(tab, blank, data->width);
 	tab[chr_pos] = chr;
 	data->pos++;
 	return (ft_save(data, tab, data->width));
@@ -353,6 +363,6 @@ int		ft_print_err(t_data *data)
 	while (data->str[i] != '%')
 		i--;
 	ft_save_chr(data, data->str[i]);
-	data->pos = i;
+	data->pos = i + 1;
 	return (1);
 }

@@ -43,8 +43,11 @@ int		ft_save_chr(t_data *data, char c)
 	*/
 	char *tmp;
 	int i;
-	
-//printf("(chr)size: %d plus %d (%c)\n", data->size, 1, c);
+printf("===================================\n");
+printf("(chr)size: %d plus %d (%c)\n", data->size, 1, c);
+printf("data->pos = %d\n", data->pos);
+ft_print_data(data);
+printf("===================================\n");
 	if(!(tmp = malloc(ft_strlen(data->out) + 2)))//tal vez usar size
 		return (0);
 	//printf("char added: %c, prev size: %d strlen %d\n", c, data->size, ft_strlen(data->out));
@@ -82,9 +85,9 @@ int		ft_save(t_data *data, char *tab, int size)
 	tab_aux = ft_arraynjoin(data->out, tab, data->size, size);
 	if (!tab_aux)
 		return (0);
-//printf("(str)size: %d plus %d (", data->size, size);
-	ft_printnchr_fd(tab, size, 1);
-//printf(")\n");
+printf("(str)size: %d plus %d (", data->size, size);
+ft_printnchr_fd(tab, size, 1);
+printf(")\n");
 	data->size += size;
 	free(data->out);
 	free(tab);

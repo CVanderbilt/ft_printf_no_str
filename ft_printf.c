@@ -137,12 +137,17 @@ int		ft_printf(const char *str, ...)
 	while (str[data.pos])
 	{
 		//printf("\n\nentra al while\nanaliza: %c\n", str[data.pos]);
+		printf("parece que modificamos str, hacer const");
+		printf("\n----------intro----------\n");
+		ft_print_data(&data);
+		printf("-------------------------\n\n");
 		if (str[data.pos] == '%')
 		{
 //printf("encontrado %%: data->pos = %d\n", data.pos);
 			data.pos++;
+			//printf("kk\n");
 			ft_state_flags(&data);
-			printf("??\n");
+			//printf("??\n");
 		}
 		else
 		{
