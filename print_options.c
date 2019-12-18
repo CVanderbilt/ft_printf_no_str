@@ -6,7 +6,7 @@
 /*   By: eherrero <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/27 18:44:24 by eherrero          #+#    #+#             */
-/*   Updated: 2019/12/17 18:13:16 by eherrero         ###   ########.fr       */
+/*   Updated: 2019/12/18 18:28:25 by eherrero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,31 +167,69 @@ char	*ft_precision_int(t_data *data, char *str, int precision)
 	return (ret);
 }
 
-void	ft_check_sign(char *str)
+char	*ft_check_sign(t_data *data, char *str, int n)
 {
-	int i;
-	int zero_pos;
+	int		i;
+	int		dgts;
+	int		sign_pos;
+	int		zero_pos;
+	char	*ret;
 
+	printf("str >%s<\n", str);
+	//printf("1\n");
+	if (!data->plus_flag && n >= 0)
+		return (str);
+	printf("2 i: %d\n", i);
 	i = 0;
-	//printf("str >%s<\n", str);
 	while (str[i] == ' ')
 		i++;
-	//printf("los espacios acaban en i %d\n", i);
+	//printf("3\n");
 	if (str[i] != '0')
-		return ;
-	//printf("encontramos un 0\n");
+		return (str);
+	printf("4\n");
+	dgts = 0;
 	zero_pos = i;
-	while (str[i] == '0')
+	while (str[i])
+	{
+		if (str[i] == '-' || str[i] == '+')
+		{
+			sign_pos = i;
+			printf("sign_pos: %d\n", i);
+		}
 		i++;
-	//printf("los 0s acaban en i %d\n", i);
-	if (!ft_in_set("+-", str[i]))
-		return ;
-	//printf("encontramos un %c\n", str[i]);
-	str[zero_pos] = str[i];
-	str[i] = '0';
-	//printf("mod: >%s<\n", str);
-}
+		dgts++;
+	}
+	if (dgts > data->precision)
+	{
+		str[zero_pos] = str[sign_pos];
+		str[sign_pos] = '0';
+		return (str);
+	}
+	else
+	{
+		if (zero_pos >= 1)
+		{
+			str[zero_pos - 1] = str[sign_pos];
+			str[sign_pos] = '0';
+			return (str);
+		}
+		else
+		{
+			dgts = ft_strlen(str);
+			ret = malloc(dgts + 2);
+			if (!ret)
+				return (0);
+			ret[dgts + 1] = 0;
+			ft_memmove (ret + 1, str, dgts);
+			ret[0] = str[sign_pos];
+			ret[sign_pos + 1] = '0';
+			printf("copy:%s\n", ret);
+			free(str);
+			return (ret);
+		}
+	}
 
+}
 
 int		ft_print_int(t_data *data)
 {
@@ -208,12 +246,15 @@ int		ft_print_int(t_data *data)
 	if (!tab)
 		return (0);
 	precision = data->precision;
-	if (data->minus_flag)
-		precision = data->precision > data->width ? precision : data->width;
+	//if (data->minus_flag)
+	//	precision = data->precision > data->width ? precision : data->width;
+	
+	//printf("precision: %d\n", precision);
 	size = ft_strlen(tab);
+	//printf("size: %d\n", size);
 	if (precision > size)
 	{
-		//printf("entra a precision\n");
+	//	printf("entra a precision\n");
 		tab_aux = ft_precision_int(data, tab, precision);
 		free(tab);
 		tab = tab_aux;
@@ -230,7 +271,39 @@ int		ft_print_int(t_data *data)
 	//ft_check_plus(data, tab);
 	//"       000000-123"
 	//"       -000000123"
-	ft_check_sign(tab);
+	//"         00000006"
+	//"x         00000006"
+	//printf"tab >%s<\n", tab);
+	//printf("width: %d,size: %d\n", data->width, size);
+
+	tab = ft_check_sign(data, tab, n);
+	size = ft_strlen(tab);
+	/*
+	if ((data->width < size || !data->zero_flag) && (n < 0 || data->plus_flag))
+	{
+		//printf("entra primer if\n");
+		//printf("width: %d,size: %d\n", data->width, size);
+		//printf("tab >%s<\n", tab);
+		n = ft_get_pos(tab, '0');
+		if (n >= 0)
+		{
+		//	printf("??\n");
+			tab_aux = malloc(size + 1);
+			if (!tab_aux)
+				return (0);
+			//printf("tab:     %s\n", tab);
+			ft_memmove(tab_aux + 1, tab, size);
+			tab_aux[0] = tab_aux[1];
+			tab_aux[n] = '0';
+			//printf("size: %d\n", size);
+			tab_aux[size + 1] = 0;
+			//printf("tab_aux: %s\n", tab_aux);
+			free(tab);
+			tab = tab_aux;
+			size = ft_strlen(tab);
+		}
+	}
+	*/
 	data->pos++;
 	//printf("devueve %s\n", tab);
 	//printf("size: %d\n", size);

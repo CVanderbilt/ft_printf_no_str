@@ -6,7 +6,7 @@
 /*   By: eherrero <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/05 17:44:33 by eherrero          #+#    #+#             */
-/*   Updated: 2019/12/16 16:40:56 by eherrero         ###   ########.fr       */
+/*   Updated: 2019/12/18 16:22:22 by eherrero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ char			*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 int				ft_atoi(const char *str);
 int				ft_dgts(long int num);
 int				ft_dgts_base(long int num, int base_size);
+int				ft_get_pos(char *str, char c);
 int				ft_in_set(char *set, char c);
 int				ft_isalnum(int c);
 int				ft_isalpha(int c);
