@@ -20,11 +20,34 @@ int main()
 	int a14;
 	int a15;
 	
+	int *p;
+	p = 0;
 	//printf("%lu\n", &kk);
+	kk = 99;
 	printf("sys:\n");
-	kk = printf("solo %-10.5d texto", -216);
+	char str[] = "hola";
+	//printf(0, &kk);
+	//kk = printf("solo %hhd texto", 22337203685477);
+	//kk = printf("%hhd", -45);
 	printf("\n%d\n", kk);
 	printf("mio:\n");
-	kk = ft_printf("solo %-10.5d texto", -216);
+	//kk = ft_printf("%hhd", -45);
+	//ft_printf(">%p<", &kk);
+	//printf(0, &kk);
+	//kk = ft_printf("solo %hhd texto", 22337203685477);
 	printf("\n%d\n", kk);
+
+	double var, var2;
+	var = 16;
+	var2 = 1223456;
+	/*
+	printf("pruebas %%f flag\n");
+	printf("     %f\n", var);
+	printf("%f\n", var2);
+	printf("%.5f\n", var);
+	printf("%20.5f\n", var);
+	printf("%020f\n", var);
+	printf("%.f\n", var);
+	printf("%-020f\n", var);
+	*/	
 }

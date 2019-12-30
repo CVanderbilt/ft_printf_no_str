@@ -12,7 +12,7 @@
 
 #include "libft.h"
 
-char		*ft_itoa_unsigned(long unsigned int n, char *base)
+char		*ft_itoa_unsigned(long long unsigned int n, char *base)
 {
 	int		len;
 	int		dgts;

@@ -23,6 +23,7 @@ void	ft_print_data(t_data *data)
 	printf("precision->%d\n", data->precision);
 	printf("minus_flag->%d\n", data->minus_flag);
 	printf("zero_flag->%d\n", data->zero_flag);
+	printf("l_flag->%d\n", data->l_flag);
 	printf("str->%s<\n", data->str);
 	printf("out->%.*s<\n", data->size, data->out);
 	printf("set_flags->%s\n", data->set_flags);
@@ -148,9 +149,10 @@ char	*ft_width_int(t_data *data, char *str)
 	}
 	ft_memset(ret + blank_start, blank, data->width - size);
 	ft_memmove(ret + str_start, str, size);
+	free (str);
 	return (ret);
 }
-
+/*
 char	*ft_precision_int(t_data *data, char *str, int precision)
 {
 	char	*ret;
@@ -165,9 +167,37 @@ char	*ft_precision_int(t_data *data, char *str, int precision)
 	ft_memset(ret, '0', precision);
 	ft_memmove(ret + precision - size, str, size);
 	return (ret);
+}*/
+
+char	*ft_precision_int(t_data *data, char *str)
+{
+	char	*ret;
+	int		len;
+
+	len = ft_strlen(str);
+	if (data->precision < len)
+	{
+		if (len == 1 && str[0] == '0' && data->precision >= 0)
+		{
+			free (str);
+			return (ft_strdup(""));
+		}
+		else
+			return (str);
+	}
+	ret = ft_calloc(data->precision + 1, 1);
+	if (!ret)
+		return (str);
+	ret[data->precision] = 0;
+	//printf("str: %p\np_mod: %d\nstr_mod: %p\nlen_mod: %d\nlen: %d\nprecision: %d\n", str, precision_mod, str_mod, len_mod, len, data->precision);
+	//printf("memmove ret + p_mod, str_mod, len_mod\n");
+	ft_memmove(ret + data->precision - len, str, len);
+	//printf("moved: %s\n", ret);
+	free (str);
+	return (ret);
 }
 
-char	*ft_check_sign(t_data *data, char *str, int n)
+/*char	*ft_check_sign(t_data *data, char *str, int n)
 {
 	int		i;
 	int		dgts;
@@ -175,26 +205,26 @@ char	*ft_check_sign(t_data *data, char *str, int n)
 	int		zero_pos;
 	char	*ret;
 
-	printf("str >%s<\n", str);
+	//printf("str >%s<\n", str);
 	//printf("1\n");
-	if (!data->plus_flag && n >= 0)
-		return (str);
-	printf("2 i: %d\n", i);
+	//if (!data->plus_flag && n >= 0)
+	//	return (str);
+	//printf("2 i: %d\n", i);
 	i = 0;
 	while (str[i] == ' ')
 		i++;
 	//printf("3\n");
 	if (str[i] != '0')
 		return (str);
-	printf("4\n");
+	//printf("4\n");
 	dgts = 0;
 	zero_pos = i;
 	while (str[i])
 	{
-		if (str[i] == '-' || str[i] == '+')
+		if (ft_in_set("+-", str[i]))
 		{
 			sign_pos = i;
-			printf("sign_pos: %d\n", i);
+			//printf("sign_pos: %d\n", i);
 		}
 		i++;
 		dgts++;
@@ -223,51 +253,119 @@ char	*ft_check_sign(t_data *data, char *str, int n)
 			ft_memmove (ret + 1, str, dgts);
 			ret[0] = str[sign_pos];
 			ret[sign_pos + 1] = '0';
-			printf("copy:%s\n", ret);
+			//printf("copy:%s\n", ret);
 			free(str);
 			return (ret);
 		}
 	}
 
+}*/
+
+char	*ft_check_sign(char *str)
+{
+	int		i;
+	int		frst_dgt;
+	int		sign_pos;
+	char	tmp;
+
+	i = 0;
+	while (str[i] == ' ')
+		i++;
+	frst_dgt = i;
+	while (str[i] == '0')
+		i++;
+	if (!str[i] || ft_isdigit(str[i]))
+		return (str);
+	//printf("sin cambios: >%s<\n", str);
+	if (str[i] == ' ' && (str[i + 1] == ' ' || !str[i + 1]))
+		return (str);
+	sign_pos = i;
+	tmp = str[sign_pos];
+	str[sign_pos] = str[frst_dgt];
+	str[frst_dgt] = tmp;
+	//printf("con cambios: >%s<\n", str);
+	return (str);
 }
 
 int		ft_print_int(t_data *data)
 {
-	int		n;
-	int		size;
-	int		precision;
-	char	*tab;
-	char	*tab_aux;
+	long long int	n;
+	int				size;
+	int				precision;
+	char			*tab;
+	char			*tab_aux;
 
 //ft_print_data(data);
-	n = va_arg(g_args, int);
-	tab = data->plus_flag ? ft_itoa_plus(n) : ft_itoa(n);
+
+	/*if (data->l_flag)
+		n = data->l_flag == 1 ? va_arg(g_args, long int) : va_arg(g_args, long long int);
+	else if (data->h_flag)
+		n = data->h_flag == 1 ? va_arg(g_args, short) : va_arg(g_args, unsigned char);
+	else
+		n = va_arg(g_args, int);*/
+	data->zero_flag = data->minus_flag ? 0 : data->zero_flag;
+	n = va_arg(g_args, long long int);
+	if (data->l_flag)
+		n = data->l_flag == 1 ? (long int)n : n;
+	else if (data->h_flag)
+		n = data->h_flag == 1 ? (short)n : (signed char)n;
+	else
+		n = (int)n;
+	if (n < 0)
+		tab_aux = ft_strdup("-");
+	else if (data->plus_flag || data->blank_flag)
+		tab_aux = data->plus_flag ? ft_strdup("+") : ft_strdup(" ");
+	else
+		tab_aux = ft_strdup("");
+	n *= n < 0 ? -1 : 1;
+	tab = ft_itoa(n); // hay que cambiar itoas para que devuelvan long long int
+	//tab = ft_strjoinfree(tab_aux, tab, 'B');
 	//printf("num >%s<\n", tab);
 	if (!tab)
 		return (0);
 	precision = data->precision;
+	data->zero_flag = precision >= 0 ? 0 : data->zero_flag; // si precision cabcela 0_flag
 	//if (data->minus_flag)
 	//	precision = data->precision > data->width ? precision : data->width;
 	
 	//printf("precision: %d\n", precision);
 	size = ft_strlen(tab);
 	//printf("size: %d\n", size);
-	if (precision > size)
+	//printf("tab: >%s<\n", tab);
+	tab = ft_precision_int(data, tab);
+	if (!data->zero_flag)
 	{
-	//	printf("entra a precision\n");
-		tab_aux = ft_precision_int(data, tab, precision);
-		free(tab);
-		tab = tab_aux;
+		tab = ft_strjoinfree(tab_aux, tab, 'B');
 		size = ft_strlen(tab);
 	}
+	//printf("tab p: >%s<\n", tab);
 	if (data->width > size)
 	{
 		//printf("entra a width\n");
-		tab_aux = ft_width_int(data, tab);
-		free(tab);
-		tab = tab_aux;
+		tab = ft_width_int(data, tab);
 		size = ft_strlen(tab);
 	}
+	if (data->zero_flag)
+	{
+		//printf("width: %d\nsize: %d\n", data->width, size);
+		if (data->width < size)
+			tab = ft_strjoinfree(tab_aux, tab, 'B');
+		else
+		{
+		//	printf("tab_aux[0]: >%c<\ntab[0]: >%c<\n", tab_aux[0], tab[0]);
+			if (tab[0] == ' ' || (tab[0] == '0' && size > 1))
+			{
+				tab[0] = tab_aux[0] ? tab_aux[0] : tab[0];
+				free (tab_aux);
+			}
+			else
+			{
+				//printf("tab_aux: >%s< tab: >%s<\n", tab_aux, tab);
+				tab = ft_strjoinfree(tab_aux, tab, 'B');
+			}
+		}
+	}
+	//printf("tab pw: >%s<\n", tab);
 	//ft_check_plus(data, tab);
 	//"       000000-123"
 	//"       -000000123"
@@ -276,7 +374,7 @@ int		ft_print_int(t_data *data)
 	//printf"tab >%s<\n", tab);
 	//printf("width: %d,size: %d\n", data->width, size);
 
-	tab = ft_check_sign(data, tab, n);
+	tab = ft_check_sign(tab);
 	size = ft_strlen(tab);
 	/*
 	if ((data->width < size || !data->zero_flag) && (n < 0 || data->plus_flag))
@@ -310,137 +408,123 @@ int		ft_print_int(t_data *data)
 	return (ft_save(data, tab, size));
 }//end print_int
 //start print_uns y valido para %x y %X
+char	*ft_check_prefix(t_data *data, char *str, char *prefix)
+{
+	//printf("str:    %s\n", str);
+	//printf("prefix: %s\n", prefix);
+	if (!prefix)
+		return (str);
+	if (data->actual_type == 'o' && str[0] == '0')
+		return (str);
+	return (ft_arraynjoinfreeR(prefix, str, ft_strlen(prefix), ft_strlen(str) + 1));
+}
+
+char	*ft_check_prefix_mod(char *str)
+{
+	int i;
+	int zero_pos;
+
+	i = 0;
+	while (str[i] == ' ')
+		i++;
+	if (str[i] != '0' || ft_in_set("xX", str[i + 1]))
+		return (str);
+	zero_pos = i;
+	while (str[i] == '0')
+		i++;
+	if (ft_in_set("xX", str[i]))
+	{
+		str[zero_pos + 1] = str[i];
+		str[i] = '0';
+	}
+	return (str);
+}
+
+char	*ft_prefix_select(t_data *data, char type, unsigned long long int n)
+{
+	if (type == 'p')
+		return (ft_strdup("0x"));
+	if (data->hash_flag && ft_in_set("xX", type) && n != 0)
+		return (type == 'x' ? ft_strdup("0x") : ft_strdup("0X"));
+	if (data->hash_flag && type == 'o')
+		return (ft_strdup("0"));
+	return (0);
+}
+
 int		ft_print_uns(t_data *data)
 {
-	unsigned int	n;
-	int				size;
-	int				precision;
-	char			*tab;
-	char			*tab_aux;
+	unsigned long long int	n;
+	int						size;
+	int						precision;
+	char					*tab;
+	char					*prefix;
 
 //printf("entra a print_uns\n");
 //ft_print_data(data);
 	data->actual_type = data->str[data->pos];
-	n = va_arg(g_args, unsigned int);
+	n = va_arg(g_args, unsigned long long int);
+	prefix = ft_prefix_select(data, data->actual_type, n);
+	tab = 0;
+	if (data->actual_type != 'p')
+	{
+		if (data->l_flag)
+			n = data->l_flag == 1 ? (unsigned long int)n : n;
+		else if (data->h_flag)
+			n = data->h_flag == 1 ? (unsigned short)n : (unsigned char)n;
+		else
+			n = (unsigned int)n;
+	}
 	if (data->actual_type == 'u')
 		tab = ft_itoa_unsigned(n, "0123456789");
-	else
-		tab = data->actual_type == 'x' ? ft_itoa_unsigned(n, "0123456789abcdef") :
+	else if (ft_in_set("xXp", data->actual_type))
+		tab = data->actual_type == 'x' || data->actual_type == 'p'? ft_itoa_unsigned(n, "0123456789abcdef") :
 			ft_itoa_unsigned(n, "0123456789ABCDEF");
+	else if (data->actual_type == 'o')
+		tab = ft_itoa_unsigned(n, "01234567");
 	if (!tab)
 		return (0);
+	//printf("tab: >%s<\n", tab);
 	precision = data->precision;
 	size = ft_strlen(tab);
 	if (data->minus_flag)
 		precision = data->precision > data->width ? precision : data->width;
-	if (precision > size)
+	tab = ft_precision_int(data, tab);
+	size = ft_strlen(tab);
+	//printf("tab p: >%s<\n", tab);
+	/*if (precision > size)
 	{
 		tab_aux = ft_precision_int(data, tab, precision);
 		free(tab);
 		tab = tab_aux;
 		size = ft_strlen(tab);
-	}
+	}*/
+	tab = ft_check_prefix(data, tab, prefix);
+	//printf("tab pp: >%s<\n", tab);
+	size = ft_strlen(tab);
 	if (data->width > size)
 	{
-		tab_aux = ft_width_int(data, tab);
-		free(tab);
-		tab = tab_aux;
+		tab = ft_width_int(data, tab);
 		size = ft_strlen(tab);
 	}
+	if (data->actual_type != 'o')
+		tab = ft_check_prefix_mod(tab);
+	//printf("tab ppw: >%s<\n", tab);
+	//printf("size: %d\n", size);
 	data->pos++;
+	if (prefix)
+		free (prefix);
 	return (ft_save(data, tab, size));
-}//end print_uns y valido para %x y %X
-//start print_ptr
-char	*ft_precision_ptr(t_data *data, char *str, int precision)
+}//end print_uns y valido para %x y %X y %p
+//start print dbl
+int		ft_print_dbl(t_data *data)
 {
-	int		len;
-	char	*ret;
+
 
 	data->pos = data->pos;
-	len = ft_strlen(str);
-	ret = malloc(precision + 1);
-	if (!ret)
-		return (0);
-	ret[precision] = 0;
-	ft_memset(ret, '0', precision - len);
-	ft_memmove(ret + precision - len, str, len);
-	return (ret);
+	return (0);	
 }
+//end print dbl
 
-char	*ft_width_ptr(t_data *data, char *str)
-{
-	int		len;
-	int		mod;
-	int		head_size;
-	char	*ret;
-	char	*ret_aux;
-
-	len = ft_strlen(str);
-	if (len < data->width - 2)
-	{
-		ret = malloc(data->width - 1);
-		if (!ret)
-			return (0);
-		mod = data->width - 2 - len;
-		ret[data->width - 1] = 0;
-		ft_memset(ret, ' ', mod);
-		ft_memmove(ret + mod, str, len);
-	}
-	else
-		ret = ft_strdup(str);
-	if (!ret)
-		return (0);
-	len = ft_strlen(ret);
-	//printf("len %d\n", len);
-	head_size = data->plus_flag ? 3 : 2;
-	printf("head_size %d\n", head_size);
-	ret_aux = malloc(len + head_size + 1);
-	printf("reserva: %d\n", len + head_size + 1);
-	if (!ret_aux)
-		return (0);
-	ft_memmove(ret_aux + 2, ret, len);
-	ret_aux[0] = data->plus_flag ? '+' : '0';
-	ret_aux[1] = data->plus_flag ? '0' : 'x';
-	ret_aux[2] = data->plus_flag ? 'x' : ret_aux[2];
-	ret_aux[len + head_size + 1] = 0;
-	free(ret);
-	ret = ret_aux;
-	return (ret);
-}
-
-int		ft_print_ptr(t_data *data)
-{
-	long unsigned int	n;
-	int					size;
-	char				*str;
-	char				*str_aux;
-
-//printf("entra a print_ptr\n");
-//ft_print_data(data);
-	n = va_arg(g_args, long unsigned int);
-	str = ft_itoa_unsigned(n, "0123456789abcdef");
-	if (!str)
-		return (0);
-	size = ft_strlen(str);
-	//printf("str >%s<\n", str);
-	//printf("size: %d\n", size);
-	data->zero_flag = data->precision < 0 ? data->zero_flag : 0;
-	if (data->zero_flag && !data->minus_flag && data->precision < data->width - 2)
-		data->precision = data->width - 2;
-	if (data->precision > size)
-	{
-		str_aux = ft_precision_ptr(data, str, data->precision);
-		free(str);
-		str = str_aux;
-		size = ft_strlen(str);
-	}
-	str_aux = ft_width_ptr(data, str);
-	free(str);
-	str = str_aux;
-	size = ft_strlen(str);
-	data->pos++;
-	return (ft_save(data, str, size));
-}//end print ptr
 //start print ptg
 int		ft_print_ptg(t_data *data)
 {
@@ -473,6 +557,18 @@ int		ft_print_ptg(t_data *data)
 	data->pos++;
 	return (ft_save(data, tab, data->width));
 }//end print ptg
+//start print num
+int		ft_print_num(t_data *data)
+{
+	int *p;
+
+	p = va_arg(g_args, int *);
+	if (!p)
+		return (1);
+	*p = data->size;
+	return (1);
+}
+//end print num
 //start print err
 int		ft_print_err(t_data *data)
 {

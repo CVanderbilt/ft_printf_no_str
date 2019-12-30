@@ -27,6 +27,10 @@ typedef struct	s_data
 	int			minus_flag;
 	int			zero_flag;
 	int			plus_flag;
+	int			l_flag;
+	int 		h_flag;
+	int			blank_flag;
+	int			hash_flag;
 	char		actual_type;
 	const char	*str;
 	char		*out;
@@ -52,6 +56,7 @@ int				ft_print_uns(t_data *data);
 int				ft_print_ptr(t_data *data);
 int				ft_print_hex(t_data *data);
 int				ft_print_ptg(t_data *data);
+int				ft_print_num(t_data *data);
 int				ft_print_err(t_data *data);
 //printt_options.c
 
@@ -59,6 +64,7 @@ int				ft_print_err(t_data *data);
 void			ft_data_init(t_data *data, const char *str);
 void			ft_reinit_data(t_data *data);
 void			ft_print_data(t_data *data);
+void			ft_free_data(t_data *data);
 int				ft_active_flag(t_data *data, char flag);
 int				ft_save(t_data *data, char *src, int size);
 int				ft_save_chr(t_data *data, char c);

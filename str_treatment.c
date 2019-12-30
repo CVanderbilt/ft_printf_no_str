@@ -20,6 +20,10 @@ int		ft_active_flag(t_data *data, char flag)
 		data->zero_flag = 1;
 	else if (flag == '+')
 		data->plus_flag = 1;
+	else if (flag == ' ')
+		data->blank_flag = 1;
+	else if (flag == '#')
+		data->hash_flag = 1;
 	else
 		return (0);
 	return (1);
@@ -137,9 +141,13 @@ void	ft_data_init(t_data *data, const char *str)
 	data->minus_flag = 0;
 	data->plus_flag = 0;
 	data->zero_flag = 0;
+	data->l_flag = 0;
+	data->h_flag = 0;
+	data->blank_flag = 0;
+	data->hash_flag = 0;
 	data->actual_type = 0;
-	data->set_flags = ft_strdup("-0+");
-	data->set_types = ft_strdup("ucsdpxXi%");
+	data->set_flags = ft_strdup("-0+ #");
+	data->set_types = ft_strdup("ucsdpxXilof%");
 	data->out = ft_strdup("");
 	data->str = ft_strdup(str);
 //	printf("sin problemas\n");
@@ -152,5 +160,17 @@ void	ft_reinit_data(t_data *data)
 	data->minus_flag = 0;
 	data->zero_flag = 0;
 	data->plus_flag = 0;
+	data->l_flag = 0;
+	data->h_flag = 0;
+	data->blank_flag = 0;
+	data->hash_flag = 0;
 	data->actual_type = 0;
+}
+
+void	ft_free_data(t_data *data)
+{
+	free(data->set_flags);
+	free(data->set_types);
+	free(data->out);
+	free((void *)data->str);
 }

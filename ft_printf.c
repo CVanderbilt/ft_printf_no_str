@@ -21,20 +21,35 @@ int		ft_state_print(t_data *data)
 	ft_print_data(data);
 	printf("----------------------------------\n\n");
 	*/
-	i = data->pos;
 	str = data->str;
 	//printf("str[i]: >%c<\n", str[i]);
+	while (ft_in_set("lh", str[data->pos]))
+	{
+		if (str[data->pos] == 'l')
+			data->l_flag++;
+		else
+			data->h_flag++;
+		data->pos++;
+	}
+	//printf("data:\n");
+	//ft_print_data(data);
+	//printf("\n");
+
+	if (data->precision >= 0)
+		data->zero_flag = 0;
+
+	i = data->pos;
 	if (str[i] == 'c')
 		return (ft_print_chr(data));
-	if (str[i] == 's')
+	else if (str[i] == 's')
 		return (ft_print_str(data));
-	if (ft_in_set("di", str[i]))
+	else if (ft_in_set("di", str[i]))
 		return (ft_print_int(data));
-	if (str[i] == 'p')
-		return (ft_print_ptr(data));
-	if (ft_in_set("uxX", str[i]))
+	else if (ft_in_set("uxXpo", str[i]))
 		return (ft_print_uns(data));
-	if (str[i] == '%')
+	else if (str[i] == 'n')
+		return (ft_print_num(data));
+	else if (str[i] == '%')
 		return (ft_print_ptg(data));
 	else
 		return (str[i] == 0 ? 1 : ft_print_err(data));

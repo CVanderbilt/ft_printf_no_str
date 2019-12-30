@@ -12,24 +12,12 @@
 
 #include "libft.h"
 
-static void	ft_kk(void *s, size_t n)
-{
-	char *i;
-
-	i = (char*)s;
-	while (n > 0)
-	{
-		*(i++) = 0;
-		n--;
-	}
-}
-
 void		*ft_calloc(size_t count, size_t size)
 {
 	void *p;
 
 	if (!(p = malloc(count * size)))
 		return (0);
-	ft_kk(p, count * size);
+	ft_memset(p, '0', count * size);
 	return (p);
 }
